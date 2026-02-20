@@ -1,0 +1,57 @@
+{
+  "name": "@truelist/svelte",
+  "version": "0.1.0",
+  "description": "Svelte actions, stores, and components for Truelist.io email validation",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Truelist-io-Email-Validation/truelist-svelte.git"
+  },
+  "homepage": "https://truelist.io",
+  "bugs": {
+    "url": "https://github.com/Truelist-io-Email-Validation/truelist-svelte/issues"
+  },
+  "keywords": [
+    "svelte",
+    "email",
+    "validation",
+    "truelist",
+    "email-validation",
+    "form-validation",
+    "action",
+    "store"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "svelte-kit sync && svelte-package",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "svelte": "^4.0.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "@sveltejs/kit": "^2.15.0",
+    "@sveltejs/package": "^2.3.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
+    "typescript": "^5.5.0",
+    "vite": "^6.0.0"
+  }
+}
