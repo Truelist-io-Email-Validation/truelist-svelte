@@ -158,7 +158,7 @@
     type="email"
     value={get(email)}
     data-validation-state={dataState}
-    aria-invalid={resultValue?.state === "invalid" ? true : undefined}
+    aria-invalid={resultValue?.state === "email_invalid" ? true : undefined}
     oninput={handleInput}
     onblur={handleBlur}
     {...restProps}

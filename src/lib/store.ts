@@ -4,7 +4,7 @@ import { verifyEmail, TruelistApiError } from "./client";
 import type { TruelistConfig, ValidationResult, ValidateOn } from "./types";
 
 export type CreateEmailValidationOptions = {
-  /** Your Truelist form API key. */
+  /** Your Truelist API key. */
   apiKey: string;
   /** Base URL for the Truelist API. Defaults to `https://api.truelist.io`. */
   baseUrl?: string;
@@ -46,7 +46,7 @@ export type EmailValidation = {
  *   import { createEmailValidation } from '@truelist/svelte';
  *
  *   const validation = createEmailValidation({
- *     apiKey: 'your-form-api-key',
+ *     apiKey: 'your-api-key',
  *   });
  *
  *   const { email, result, isValidating } = validation;
@@ -55,7 +55,7 @@ export type EmailValidation = {
  * <input type="email" bind:value={$email} />
  * {#if $isValidating}
  *   <span>Checking...</span>
- * {:else if $result?.state === 'valid'}
+ * {:else if $result?.state === 'ok'}
  *   <span>Valid!</span>
  * {/if}
  * ```
