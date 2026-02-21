@@ -3,7 +3,7 @@ import { verifyEmail, TruelistApiError } from "./client";
 import type { TruelistConfig, ValidationResult, ValidateOn } from "./types";
 
 export type TruelistActionOptions = {
-  /** Your Truelist form API key. */
+  /** Your Truelist API key. */
   apiKey: string;
   /** Base URL for the Truelist API. Defaults to `https://api.truelist.io`. */
   baseUrl?: string;
@@ -34,7 +34,7 @@ export type TruelistActionOptions = {
  * <input
  *   type="email"
  *   use:truelist={{
- *     apiKey: 'your-form-api-key',
+ *     apiKey: 'your-api-key',
  *     debounceMs: 500,
  *     validateOn: 'blur',
  *     onResult: (r) => result = r,
@@ -91,7 +91,7 @@ export const truelist: Action<HTMLInputElement, TruelistActionOptions> = (
       node.dataset.validationState = result.state;
       node.setAttribute(
         "aria-invalid",
-        result.state === "invalid" ? "true" : "false"
+        result.state === "email_invalid" ? "true" : "false"
       );
       currentOptions.onResult?.(result);
     } catch (err: unknown) {

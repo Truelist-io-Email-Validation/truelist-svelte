@@ -22,16 +22,16 @@ Use the `truelist` action on any input:
 <input
   type="email"
   use:truelist={{
-    apiKey: 'your-form-api-key',
+    apiKey: 'your-api-key',
     debounceMs: 500,
     validateOn: 'blur',
     onResult: (r) => result = r,
   }}
 />
 
-{#if result?.state === 'valid'}
+{#if result?.state === 'ok'}
   <span>Valid!</span>
-{:else if result?.state === 'invalid'}
+{:else if result?.state === 'email_invalid'}
   <span>Invalid email</span>
 {/if}
 ```
@@ -45,7 +45,7 @@ Use `createEmailValidation` for headless state management:
   import { createEmailValidation } from '@truelist/svelte';
 
   const validation = createEmailValidation({
-    apiKey: 'your-form-api-key',
+    apiKey: 'your-api-key',
     debounceMs: 500,
   });
 
@@ -56,9 +56,9 @@ Use `createEmailValidation` for headless state management:
 
 {#if $isValidating}
   <span>Checking...</span>
-{:else if $result?.state === 'valid'}
+{:else if $result?.state === 'ok'}
   <span>Valid!</span>
-{:else if $result?.state === 'invalid'}
+{:else if $result?.state === 'email_invalid'}
   <span>Invalid email</span>
 {/if}
 
@@ -87,7 +87,7 @@ Use `createEmailValidation` for headless state management:
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `apiKey` | `string` | -- | Your Truelist form API key |
+| `apiKey` | `string` | -- | Your Truelist API key |
 | `baseUrl` | `string` | `https://api.truelist.io` | Custom API base URL |
 | `debounceMs` | `number` | `500` | Debounce delay. Set to 0 to disable. |
 | `validateOn` | `"blur" \| "change"` | `"blur"` | When to trigger automatic validation |
@@ -104,7 +104,7 @@ Wrap your app with `TruelistProvider` to make the API key available via Svelte c
   import { TruelistProvider } from '@truelist/svelte';
 </script>
 
-<TruelistProvider apiKey="your-form-api-key">
+<TruelistProvider apiKey="your-api-key">
   <slot />
 </TruelistProvider>
 ```
@@ -137,7 +137,7 @@ The action attaches validation directly to any `<input>` element. It sets `data-
 <input
   type="email"
   use:truelist={{
-    apiKey: 'your-form-api-key',
+    apiKey: 'your-api-key',
     debounceMs: 500,
     validateOn: 'blur',
     onResult: (r) => result = r,
@@ -150,7 +150,7 @@ The action attaches validation directly to any `<input>` element. It sets `data-
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `apiKey` | `string` | -- | Your Truelist form API key |
+| `apiKey` | `string` | -- | Your Truelist API key |
 | `baseUrl` | `string` | `https://api.truelist.io` | Custom API base URL |
 | `debounceMs` | `number` | `500` | Debounce delay. Set to 0 to disable. |
 | `validateOn` | `"blur" \| "change"` | `"blur"` | When to trigger automatic validation |
@@ -170,7 +170,7 @@ A composable, unstyled email input with built-in validation.
 
 <EmailInput
   bind:value={email}
-  apiKey="your-form-api-key"
+  apiKey="your-api-key"
   validateOn="blur"
   debounceMs={500}
   placeholder="you@example.com"
@@ -183,7 +183,7 @@ A composable, unstyled email input with built-in validation.
 Customize rendering with named snippets:
 
 ```svelte
-<EmailInput bind:value={email} apiKey="your-form-api-key">
+<EmailInput bind:value={email} apiKey="your-api-key">
   {#snippet validating()}
     <span class="spinner">Verifying...</span>
   {/snippet}
@@ -197,7 +197,7 @@ Customize rendering with named snippets:
   {/snippet}
 
   {#snippet result({ result })}
-    {#if result.state === 'valid'}
+    {#if result.state === 'ok'}
       <span class="success">Looks good!</span>
     {/if}
   {/snippet}
@@ -209,7 +209,7 @@ Customize rendering with named snippets:
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `string` | `""` | The email value (use `bind:value`) |
-| `apiKey` | `string` | -- | Your Truelist form API key (or use provider) |
+| `apiKey` | `string` | -- | Your Truelist API key (or use provider) |
 | `baseUrl` | `string` | `https://api.truelist.io` | Custom API base URL |
 | `validateOn` | `"blur" \| "change"` | `"blur"` | When to trigger validation |
 | `debounceMs` | `number` | `500` | Debounce delay for "change" mode |
@@ -224,15 +224,15 @@ Customize rendering with named snippets:
 Both the action and component expose `data-validation-state` for CSS styling:
 
 ```css
-input[data-validation-state="valid"] {
+input[data-validation-state="ok"] {
   border-color: green;
 }
 
-input[data-validation-state="invalid"] {
+input[data-validation-state="email_invalid"] {
   border-color: red;
 }
 
-input[data-validation-state="risky"] {
+input[data-validation-state="accept_all"] {
   border-color: orange;
 }
 
@@ -260,17 +260,16 @@ import type {
 ### `ValidationState`
 
 ```ts
-type ValidationState = "valid" | "invalid" | "risky" | "unknown";
+type ValidationState = "ok" | "email_invalid" | "accept_all" | "unknown";
 ```
 
 ### `ValidationSubState`
 
 ```ts
 type ValidationSubState =
-  | "ok"
-  | "accept_all"
-  | "disposable_address"
-  | "role_address"
+  | "email_ok"
+  | "is_disposable"
+  | "is_role"
   | "failed_mx_check"
   | "failed_spam_trap"
   | "failed_no_mailbox"
@@ -283,12 +282,16 @@ type ValidationSubState =
 
 ```ts
 type ValidationResult = {
+  email: string;
   state: ValidationState;
   subState: ValidationSubState;
-  email: string;
-  suggestion?: string;
-  freeEmail?: boolean;
-  role?: boolean;
+  domain: string;
+  canonical: string;
+  mxRecord: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  verifiedAt: string;
+  suggestion: string | null;
 };
 ```
 
@@ -307,15 +310,14 @@ type TruelistConfig = {
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `apiKey` | `string` | *required* | Your Truelist form API key |
+| `apiKey` | `string` | *required* | Your Truelist API key |
 | `baseUrl` | `string` | `https://api.truelist.io` | Custom API base URL |
 
 ### API Details
 
-- **Endpoint**: `POST https://api.truelist.io/api/v1/form_verify`
-- **Auth**: Bearer token (your form API key)
-- **Rate limit**: 60 requests per minute for form keys
-- **Billing**: Credits are only charged for definitive results (`valid`/`invalid`), not for `unknown`
+- **Endpoint**: `POST https://api.truelist.io/api/v1/verify_inline?email=...`
+- **Auth**: Bearer token (your API key)
+- **Account**: `GET https://api.truelist.io/me`
 
 Get your API key at [truelist.io](https://truelist.io).
 
